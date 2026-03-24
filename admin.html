@@ -925,33 +925,47 @@ pre.integ-code{background:var(--dark3);border:1px solid rgba(255,255,255,0.07);p
       </div>
 
       <!-- ══ CATEGORIES ══════════════════════════════════════ -->
-      <div class="admin-tab" id="tab-categories">
-        <div class="admin-tab-title">Categories</div>
-        <div class="admin-tab-sub">Organise your store's product categories. Control age restrictions and category visibility.</div>
-        <div class="admin-section">
-          <div class="admin-section-head">
-            <h3><i class="fas fa-folder" style="margin-right:8px;"></i>All Categories</h3>
-            <button class="add-btn" onclick="openCatModal()"><i class="fas fa-plus"></i> Add Category</button>
-          </div>
-          <div class="admin-section-body">
-            <div id="catAdminStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px;">
-              <div style="background:var(--dark3);padding:16px;border-radius:var(--radius);border-left:3px solid var(--white);">
-                <div style="font-family:var(--font-sans);font-size:9px;color:var(--gray);font-weight:700;letter-spacing:0.1em;margin-bottom:6px;">TOTAL CATEGORIES</div>
-                <div style="font-size:24px;font-weight:700;color:var(--white);" id="totalCatCount">0</div>
-              </div>
-              <div style="background:var(--dark3);padding:16px;border-radius:var(--radius);border-left:3px solid #ffc107;">
-                <div style="font-family:var(--font-sans);font-size:9px;color:var(--gray);font-weight:700;letter-spacing:0.1em;margin-bottom:6px;">AGE RESTRICTED</div>
-                <div style="font-size:24px;font-weight:700;color:#ffc107;" id="restrictedCatCount">0</div>
-              </div>
-              <div style="background:var(--dark3);padding:16px;border-radius:var(--radius);border-left:3px solid #4caf50;">
-                <div style="font-family:var(--font-sans);font-size:9px;color:var(--gray);font-weight:700;letter-spacing:0.1em;margin-bottom:6px;">TOTAL PRODUCTS</div>
-                <div style="font-size:24px;font-weight:700;color:#4caf50;" id="totalProdCount">0</div>
-              </div>
-            </div>
-            <div class="cat-admin-grid" id="catAdminGrid"></div>
-          </div>
+     <div class="modal-overlay" id="catFormOverlay" onclick="closeCatModal()"></div>
+<div class="admin-modal" id="catFormModal">
+  <div class="admin-modal-head"><h3>Add New Category</h3><button onclick="closeCatModal()" class="modal-close">✕</button></div>
+  <div class="admin-modal-body">
+    <div class="form-group"><label>Category Name *</label><input type="text" id="catName" placeholder="e.g. Air Conditioners"/></div>
+    <div class="form-group">
+      <label>Category Image</label>
+      <div class="media-dropzone mini-dropzone" id="catDropzone"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="handleCatImgDrop(event)">
+        <div class="dropzone-inner">
+          <p class="dropzone-text">Drop image here or</p>
+          <button class="dropzone-btn" onclick="document.getElementById('catFileInput').click()">Browse</button>
         </div>
+        <input type="file" id="catFileInput" accept="image/*" style="display:none" onchange="handleCatFile(this.files[0])"/>
       </div>
+      <div id="catImgPreviewWrap" style="display:none;margin-top:10px;">
+        <img id="catImgPreview" class="img-preview" onerror="this.src='images/logo.png'"/>
+        <button class="remove-media-btn" onclick="removeCatImg()">✕ Remove</button>
+      </div>
+      <div class="pf-url-row" style="margin-top:10px;">
+        <input type="text" id="catImage" class="pf-url-input" placeholder="images/category.jpg or URL"/>
+        <button class="pf-url-add-btn" onclick="previewCatUrl()">Preview</button>
+      </div>
+    </div>
+    <div class="form-group"><label>Description</label><input type="text" id="catDesc" placeholder="Short category description"/></div>
+    <div class="form-group">
+      <label>Age Restriction (18+)</label>
+      <div class="cat-age-toggle-wrap" style="margin-top:6px;">
+        <button type="button" id="catAgeYes" class="cat-age-btn" onclick="setCatFormAge(true)">Yes — 18+ Only</button>
+        <button type="button" id="catAgeNo"  class="cat-age-btn cat-age-no" onclick="setCatFormAge(false)">No — All Ages</button>
+      </div>
+      <input type="hidden" id="catAgeRestricted" value="false"/>
+    </div>
+    <div class="form-actions">
+      <button class="cancel-btn" onclick="closeCatModal()">Cancel</button>
+      <button class="save-btn" onclick="saveCategory()">Add Category</button>
+    </div>
+  </div>
+</div>
 
       <!-- ══ ORDERS ══════════════════════════════════════ -->
       <div class="admin-tab" id="tab-orders">
