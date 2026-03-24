@@ -1,0 +1,50 @@
+{
+  "name": "pds-commerce-suite",
+  "version": "4.5.0",
+  "description": "Paramount E-mart \u2014 zero-dependency Node.js e-commerce server with full admin panel, live tracking, payments, and PWA",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "production": "NODE_ENV=production node server.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:reload": "pm2 reload paramount-store",
+    "pm2:stop": "pm2 stop paramount-store",
+    "pm2:logs": "pm2 logs paramount-store",
+    "test": "jest --detectOpenHandles --forceExit",
+    "lint": "eslint js/ --ext .js",
+    "setup:db": "node scripts/setup-db.js",
+    "check": "node --check server.js && echo \"server.js OK\""
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "ecommerce",
+    "nigeria",
+    "paystack",
+    "flutterwave",
+    "paypal",
+    "store",
+    "pwa",
+    "zero-dependency"
+  ],
+  "author": "Paramount Digital Services",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "nodemailer": "^6.9.1",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "compression": "^1.7.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "jest": "^29.5.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.40.0"
+  }
+}

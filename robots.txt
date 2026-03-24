@@ -1,0 +1,26 @@
+# Paramount E-mart — robots.txt
+# https://www.paramountdigitalservices.com/
+
+User-agent: *
+Allow: /
+Allow: /tracking.html
+Allow: /images/
+Allow: /css/
+Allow: /js/
+
+# Private pages — do not index
+Disallow: /admin.html
+Disallow: /pds-control-panel.html
+Disallow: /receipt.html
+Disallow: /admin/
+Disallow: /data/
+Disallow: /logs/
+Disallow: /backups/
+Disallow: /forms/config.js
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://www.paramountdigitalservices.com/sitemap.xml
+
+# Crawl-delay for polite crawlers
+Crawl-delay: 1

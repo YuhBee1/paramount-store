@@ -1,0 +1,56 @@
+MIT License
+
+Copyright (c) 2025 Paramount Digital Services
+Paramount E-mart — paramountdigitalservices.com
+Uyo, Akwa Ibom State, Nigeria
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+────────────────────────────────────────────────────────────────────────────
+
+PARAMOUNT E-MART — FEATURE OVERVIEW
+
+A production-grade PWA e-commerce platform for premium electronics retail.
+
+CORE FEATURES
+  • Product catalogue: categories, search, share links, slideshows
+  • Age-restricted categories: 18+ verification with 4-hour session
+  • Multi-gateway checkout: Flutterwave · OPay · Crypto (USDT/BTC/ETH)
+  • Live shipment tracking: global satellite map (Leaflet + Esri)
+  • Support ticket system with WhatsApp + Google Sheets notification
+  • Online courses marketplace with enrollment + share links
+  • Support, Contact, Receipt — all rendered as in-page popups
+  • Google Sheets — ALL forms auto-sync (checkout, support, age, newsletter)
+  • Foundation-style admin: 11 tabs, full CRUD, shipment editor, age admin
+  • PWA: offline via Service Worker, installable on mobile + desktop
+  • Bulk discount tiers + promo code engine
+  • Age verification: pesVerifying() loader, 30-day persistent record
+
+THIRD-PARTY LICENSES
+  Leaflet.js         BSD 2-Clause       leafletjs.com
+  Esri World Imagery Esri Terms         esri.com
+  Flutterwave SDK    Flutterwave Terms  flutterwave.com
+  EmailJS            EmailJS Terms      emailjs.com
+  Google Fonts       Open Font License  fonts.google.com
+  Font Awesome Free  FA Free License    fontawesome.com
+
+BUILT WITH ♥ IN NIGERIA
+  contact: paramountdigitalservices@gmail.com
+  WhatsApp: +234 916 043 9848
+────────────────────────────────────────────────────────────────────────────
