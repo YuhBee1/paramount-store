@@ -64,136 +64,180 @@ function initEnhancements() {
   renderCategoryAgeToggle();
 }
 
-// ═══════════════════════════════════════════════
-// MEDIA LIBRARY — DRAG & DROP UPLOAD
-// ═══════════════════════════════════════════════
-function initMediaDragDrop() {
-  const dropzone = document.getElementById('mediaDropzone');
-  if (!dropzone) return;
+/* =============================================
+   PARAMOUNT E-STORE — ADMIN JS (ENHANCED)
+   Unified Media Library, Promos, & Categories
+   ============================================= */
 
-  dropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropzone.classList.add('drag-active');
+// ─── MEDIA LIBRARY CORE ──────────────────────
+
+function initMediaManager() {
+  const dropZone = document.getElementById('mediaDropZone');
+  const fileInput = document.getElementById('mediaLibUpload');
+
+  if (!dropZone || !fileInput) return;
+
+  // Click to Upload
+  dropZone.onclick = () => fileInput.click();
+
+  // Drag & Drop Listeners
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(name => {
+    dropZone.addEventListener(name, e => {
+      e.preventDefault();
+      e.stopPropagation();
+    }, false);
   });
 
-  dropzone.addEventListener('dragleave', () => {
-    dropzone.classList.remove('drag-active');
-  });
-
-  dropzone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('drag-active');
-    const files = Array.from(e.dataTransfer.files);
-    files.forEach(file => {
-      if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
-        uploadMediaFile(file);
-      }
-    });
-  });
-}
-
-async function uploadMediaFile(file) {
-  const progressBar = document.getElementById('mediaUploadProgress');
-  const progressText = document.getElementById('mediaUploadText');
+  dropZone.ondragover = () => dropZone.classList.add('drag-active');
+  dropZone.ondragleave = () => dropZone.classList.remove('drag-active');
   
-  if (progressBar) progressBar.style.display = 'block';
-  if (progressText) progressText.textContent = 'Uploading...';
+  dropZone.ondrop = (e) => {
+    dropZone.classList.remove('drag-active');
+    handleMediaFiles(e.dataTransfer.files);
+  };
 
-  const formData = new FormData();
-  formData.append('file', file);
+  fileInput.onchange = (e) => {
+    handleMediaFiles(e.target.files);
+    fileInput.value = ''; 
+  };
 
-  try {
-    const response = await fetch(`${SERVER}/api/upload-media`, {
-      method: 'POST',
-      headers: { 'X-PDS-Session': _getSession() || '' },
-      body: formData,
-    });
+  renderMediaLib();
+}
 
-    const data = await response.json();
-    
-    if (data.ok && data.path) {
-      mediaLibraryFiles.push({
-        path: data.path,
+function handleMediaFiles(files) {
+  const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (!validFiles.length) return;
+
+  const progressWrap = document.getElementById('mediaUploadProgress');
+  const bar = document.getElementById('mediaUploadBar');
+  const percentTxt = document.getElementById('mediaUploadPercent');
+
+  progressWrap.style.display = 'block';
+  let done = 0;
+
+  validFiles.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const library = JSON.parse(localStorage.getItem('pes_media_lib') || '[]');
+      library.unshift({
+        data: e.target.result,
         name: file.name,
-        type: file.type,
-        uploaded: new Date().toLocaleString('en-NG'),
+        date: new Date().toISOString()
       });
-      saveMediaLibrary();
-      renderMediaLibraryGrid();
-      showToast('✓ Media uploaded successfully: ' + file.name);
-      if (progressText) progressText.textContent = 'Upload complete!';
-    } else {
-      showToast('❌ Upload failed: ' + (data.message || 'Unknown error'));
-    }
-  } catch (error) {
-    console.error('Media upload error:', error);
-    showToast('❌ Upload error: ' + error.message);
-  } finally {
-    if (progressBar) setTimeout(() => { progressBar.style.display = 'none'; }, 2000);
-  }
+      localStorage.setItem('pes_media_lib', JSON.stringify(library));
+      
+      done++;
+      const pct = Math.round((done / validFiles.length) * 100);
+      bar.style.width = pct + '%';
+      percentTxt.textContent = pct;
+
+      if (done === validFiles.length) {
+        setTimeout(() => {
+          progressWrap.style.display = 'none';
+          renderMediaLib();
+          if(window.showToast) showToast(`Successfully uploaded ${done} images!`);
+        }, 500);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
-function loadMediaLibrary() {
-  try {
-    const stored = localStorage.getItem('pes_media_library');
-    mediaLibraryFiles = stored ? JSON.parse(stored) : [];
-    renderMediaLibraryGrid();
-  } catch (e) {
-    console.error('Error loading media library:', e);
-    mediaLibraryFiles = [];
-  }
-}
-
-function saveMediaLibrary() {
-  localStorage.setItem('pes_media_library', JSON.stringify(mediaLibraryFiles));
-}
-
-function renderMediaLibraryGrid() {
+function renderMediaLib() {
   const grid = document.getElementById('mediaLibGrid');
   if (!grid) return;
 
-  if (!mediaLibraryFiles.length) {
-    document.getElementById('mediaLibEmpty').style.display = 'block';
-    grid.innerHTML = '';
+  const library = JSON.parse(localStorage.getItem('pes_media_lib') || '[]');
+  
+  if (!library.length) {
+    grid.innerHTML = '<div class="empty-msg">No media found. Drag images here.</div>';
     return;
   }
 
-  document.getElementById('mediaLibEmpty').style.display = 'none';
-  grid.innerHTML = mediaLibraryFiles.map((file, idx) => `
-    <div class="media-lib-item">
-      <div class="media-lib-thumb">
-        ${file.type.startsWith('image/') 
-          ? `<img src="${file.path}" alt="${file.name}" onerror="this.src='images/logo.png'"/>`
-          : `<div class="media-lib-video-icon">🎬</div>`
-        }
+  grid.innerHTML = library.map((item, i) => `
+    <div class="media-card">
+      <img src="${item.data}" onclick="window.open('${item.data}')" title="Preview">
+      <div class="media-info">
+        <span>${item.name}</span>
       </div>
-      <div class="media-lib-info">
-        <div class="media-lib-name" title="${file.name}">${file.name.substring(0, 20)}</div>
-        <div class="media-lib-meta">${file.uploaded}</div>
-      </div>
-      <div class="media-lib-actions">
-        <button class="media-lib-copy" onclick="copyToClipboard('${file.path}')" title="Copy link">📋</button>
-        <button class="media-lib-delete" onclick="deleteMediaFile(${idx})" title="Delete">✕</button>
+      <div class="media-actions">
+        <button onclick="downloadMedia('${item.data}', '${item.name}')" title="Download"><i class="fas fa-download"></i></button>
+        <button onclick="copyMediaURL('${item.data}')" title="Copy URL"><i class="fas fa-link"></i></button>
+        <button onclick="deleteMedia(${i})" class="del-btn" title="Delete"><i class="fas fa-trash"></i></button>
       </div>
     </div>
   `).join('');
 }
 
-function deleteMediaFile(idx) {
-  if (confirm('Delete this media file?')) {
-    mediaLibraryFiles.splice(idx, 1);
-    saveMediaLibrary();
-    renderMediaLibraryGrid();
-    showToast('Media file deleted');
-  }
+// --- Media Helpers ---
+window.downloadMedia = (data, name) => {
+  const a = document.createElement('a');
+  a.href = data; a.download = name || 'upload.png';
+  a.click();
+};
+
+window.copyMediaURL = (data) => {
+  navigator.clipboard.writeText(data).then(() => { if(window.showToast) showToast("URL Copied!"); });
+};
+
+window.deleteMedia = (index) => {
+  if (!confirm("Delete this image?")) return;
+  const lib = JSON.parse(localStorage.getItem('pes_media_lib') || '[]');
+  lib.splice(index, 1);
+  localStorage.setItem('pes_media_lib', JSON.stringify(lib));
+  renderMediaLib();
+};
+
+// ─── CATEGORY & PROMO MANAGEMENT ─────────────────
+// (Keeping your existing logic for these below)
+
+function getCategories() { return JSON.parse(localStorage.getItem('pes_categories') || '[]'); }
+function saveCategories(c) { localStorage.setItem('pes_categories', JSON.stringify(c)); }
+
+function renderCatAdmin() {
+  const container = document.getElementById('catAdminList');
+  if (!container) return;
+  const cats = getCategories();
+  const products = JSON.parse(localStorage.getItem('pes_products') || '[]');
+
+  container.innerHTML = cats.map(cat => {
+    const count = products.filter(p => p.category === cat.name).length;
+    const isRestricted = !!cat.ageRestricted;
+    return `
+      <div class="cat-admin-card">
+        <div class="cat-admin-header">
+           <strong>${cat.name}</strong>
+           <button class="cat-del-btn" onclick="deleteCategory(${cat.id}, '${cat.name}')">&times;</button>
+        </div>
+        <div class="cat-admin-age-row">
+          <span>Age Restricted:</span>
+          <button class="cat-age-btn ${isRestricted ? 'active' : ''}" onclick="setCatAgeRestricted(${cat.id}, ${!isRestricted})">
+            ${isRestricted ? 'YES' : 'NO'}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
-function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('✓ Link copied to clipboard');
-  });
+function setCatAgeRestricted(id, val) {
+  const cats = getCategories();
+  const c = cats.find(x => x.id === id);
+  if(c) { c.ageRestricted = val; saveCategories(cats); renderCatAdmin(); }
 }
 
+function deleteCategory(id, name) {
+  if(!confirm(`Delete category "${name}"?`)) return;
+  saveCategories(getCategories().filter(c => c.id !== id));
+  renderCatAdmin();
+}
+
+// ─── INITIALIZATION ─────────────────────────────
+window.initAdminEnhancements = function() {
+  initMediaManager();
+  renderCatAdmin();
+  // Add other init calls here (promos, etc)
+};
 // ═══════════════════════════════════════════════
 // PROMO CODES EDITOR — FULL CRUD
 // ═══════════════════════════════════════════════
